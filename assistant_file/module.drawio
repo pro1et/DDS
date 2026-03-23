@@ -1,0 +1,36 @@
+<mxfile host="65bd71144e">
+    <diagram id="wJ_Dsyj7lOLzeds_ToUo" name="Page-1">
+        <mxGraphModel dx="1108" dy="636" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="42" style="edgeStyle=elbowEdgeStyle;shape=connector;rounded=1;elbow=vertical;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="2" target="30">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="locked" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" connectable="0" parent="42">
+                    <mxGeometry x="-0.3826" y="-2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="2" value="clock" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=default;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="510" width="80" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="controller" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="340" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="s" style="group" parent="1" vertex="1" connectable="0">
+                    <mxGeometry x="480" y="290" width="140" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="phase_accumulator" style="rounded=0;whiteSpace=wrap;html=1;" parent="29" vertex="1">
+                    <mxGeometry x="-9.333333333333334" y="-11.666666666666664" width="140" height="139.99999999999997" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="freq_com" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;labelBorderColor=none;textShadow=0;" parent="29" vertex="1">
+                    <mxGeometry y="81.66666666666664" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="Rst" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="540" width="80" height="160" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
