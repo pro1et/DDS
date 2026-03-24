@@ -28,6 +28,5 @@ module accumulator #(
             phase_out <= (phase_acc + phase_offset) >> (ADDR_WIDTH - PHASE_WIDTH);
         end
     end
-
 endmodule
 //I love Gemini!
