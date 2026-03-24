@@ -22,3 +22,5 @@
 # Available Virtual  : 22192 MB
 #-----------------------------------------------------------
 start_gui
+open_project E:/Vivado/FPGA_project/DDS/DDS.xpr
+update_compile_order -fileset sources_1

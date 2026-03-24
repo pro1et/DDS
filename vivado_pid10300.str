@@ -142,3 +142,29 @@ Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 // TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
 // TclEventType: FILE_SET_CHANGE
 // TclEventType: LOAD_FEATURE
+// HMemoryUtils.trashcanNow. Engine heap size: 1,027 MB. GUI used memory: 69 MB. Current time: 3/24/26, 8:16:38 PM CST
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 131 MB (+134961kb) [00:00:23]
+// [Engine Memory]: 1,293 MB (+1204206kb) [00:00:23]
+// WARNING: HEventQueue.dispatchEvent() is taking  1117 ms.
+// Tcl Message: open_project E:/Vivado/FPGA_project/DDS/DDS.xpr 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// Tcl Message: INFO: [Common 17-14] Message 'Board 49-26' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings. 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'F:/AMDDesignTools/2025.2/Vivado/data/ip'. INFO: [Device 21-403] Loading part xc7z020clg400-2 
+// Project name: DDS; location: E:/Vivado/FPGA_project/DDS; part: xc7z020clg400-2
+// Tcl Message: open_project: Time (s): cpu = 00:00:08 ; elapsed = 00:00:20 . Memory (MB): peak = 1961.695 ; gain = 515.711 
+dismissDialog("Open Project"); // bk (Open Project Progress)
+// TclEventType: DG_GRAPH_GENERATED
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: FILE_SET_CHANGE
+// Tcl Message: update_compile_order -fileset sources_1 
+// TclEventType: DG_GRAPH_GENERATED
+// HMemoryUtils.trashcanNow. Engine heap size: 1,345 MB. GUI used memory: 72 MB. Current time: 3/24/26, 8:17:09 PM CST
+// Elapsed time: 26 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, dds_top (dds_top.v)]", 1); // E (PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE)
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, dds_top (dds_top.v)]", 1, true); // E (PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, dds_top (dds_top.v)]", 1, true, false, false, false, false, true); // E (PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE) - Double Click - Node
+selectCodeEditor("dds_top.v", 446, 241); // ae (dds_top.v)
+selectCodeEditor("dds_top.v", 235, 134); // ae (dds_top.v)
+// [GUI Memory]: 142 MB (+4463kb) [00:01:03]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,345 MB. GUI used memory: 76 MB. Current time: 3/24/26, 8:17:49 PM CST
