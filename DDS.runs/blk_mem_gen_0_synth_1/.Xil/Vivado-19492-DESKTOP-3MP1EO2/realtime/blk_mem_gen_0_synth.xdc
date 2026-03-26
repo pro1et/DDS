@@ -1,8 +1,0 @@
-set_property SRC_FILE_INFO {cfile:e:/Vivado/FPGA_project/DDS/project_1.gen/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_ooc.xdc rfile:../../../../../project_1.gen/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_ooc.xdc id:1 order:EARLY scoped_inst:U0} [current_design]
-set_property SRC_FILE_INFO {cfile:E:/Vivado/FPGA_project/DDS/DDS.runs/blk_mem_gen_0_synth_1/dont_touch.xdc rfile:../../../dont_touch.xdc id:2} [current_design]
-set_property src_info {type:SCOPED_XDC file:1 line:53 export:INPUT save:INPUT read:FILTER_OUT_OF_CONTEXT} [current_design]
-create_clock -period 20.000 -name TS_CLKA [get_ports clka]
-set_property src_info {type:SCOPED_XDC file:1 line:54 export:INPUT save:INPUT read:FILTER_OUT_OF_CONTEXT} [current_design]
-set_property HD.CLK_SRC BUFGCTRL_X0Y0 [get_ports clka]
-set_property src_info {type:XDC file:2 line:9 export:INPUT save:INPUT read:READ} [current_design]
-set_property KEEP_HIERARCHY SOFT [get_cells U0]
