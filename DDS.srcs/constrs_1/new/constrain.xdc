@@ -38,7 +38,7 @@ set_property PACKAGE_PIN J15 [get_ports {keys[2]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {keys[*]}]
 
 # DAC data [13:0]
-set_property PACKAGE_PIN K19 [get_ports {dac_data[0]}]
+set_property PACKAGE_PIN K16 [get_ports {dac_data[0]}]
 set_property PACKAGE_PIN J19 [get_ports {dac_data[1]}]
 set_property PACKAGE_PIN K19 [get_ports {dac_data[2]}]
 set_property PACKAGE_PIN L15 [get_ports {dac_data[3]}]

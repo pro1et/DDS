@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_dds_system_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_dds_system" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="1,403.187 ns"></ZoomStartTime>
+      <ZoomEndTime time="2,026.688 ns"></ZoomEndTime>
+      <Cursor1Time time="1,714.545 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="142"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="19" />
+   <wvobject fp_name="/tb_dds_system/sys_clk" type="logic">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/keys" type="array">
+      <obj_property name="ElementShortName">keys[2:0]</obj_property>
+      <obj_property name="ObjectShortName">keys[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/dac_data" type="array">
+      <obj_property name="ElementShortName">dac_data[13:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/dac_clk" type="logic">
+      <obj_property name="ElementShortName">dac_clk</obj_property>
+      <obj_property name="ObjectShortName">dac_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/locked" type="logic">
+      <obj_property name="ElementShortName">locked</obj_property>
+      <obj_property name="ObjectShortName">locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/sys_clk" type="logic">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/keys" type="array">
+      <obj_property name="ElementShortName">keys[2:0]</obj_property>
+      <obj_property name="ObjectShortName">keys[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/dac_data" type="array">
+      <obj_property name="ElementShortName">dac_data[13:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/dac_clk" type="logic">
+      <obj_property name="ElementShortName">dac_clk</obj_property>
+      <obj_property name="ObjectShortName">dac_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/locked" type="logic">
+      <obj_property name="ElementShortName">locked</obj_property>
+      <obj_property name="ObjectShortName">locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/clk_100M_internal" type="logic">
+      <obj_property name="ElementShortName">clk_100M_internal</obj_property>
+      <obj_property name="ObjectShortName">clk_100M_internal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/rst_n_internal" type="logic">
+      <obj_property name="ElementShortName">rst_n_internal</obj_property>
+      <obj_property name="ObjectShortName">rst_n_internal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/w_ftw" type="array">
+      <obj_property name="ElementShortName">w_ftw[31:0]</obj_property>
+      <obj_property name="ObjectShortName">w_ftw[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/w_ptw" type="array">
+      <obj_property name="ElementShortName">w_ptw[31:0]</obj_property>
+      <obj_property name="ObjectShortName">w_ptw[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/k1_p" type="logic">
+      <obj_property name="ElementShortName">k1_p</obj_property>
+      <obj_property name="ObjectShortName">k1_p</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/k2_p" type="logic">
+      <obj_property name="ElementShortName">k2_p</obj_property>
+      <obj_property name="ObjectShortName">k2_p</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_system/u_wrapper/k3_p" type="logic">
+      <obj_property name="ElementShortName">k3_p</obj_property>
+      <obj_property name="ObjectShortName">k3_p</obj_property>
+   </wvobject>
+</wave_config>

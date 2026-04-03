@@ -7,16 +7,17 @@ module dds_top(
     input  wire [31:0] ptw,          // Phase Tuning Word (Phase_sum)
     output wire [13:0] dac_data,     // 14-bit Sine Wave data
     output wire        dac_clk,      // Clock signal for DAC904
-    output wire        locked        // PLL lock status LED
-);
-
+    output wire        locked,        // PLL lock status LED
+    output wire        clk_out_100M, // 100MHz clock output for internal use
+    output wire        sys_rst_n_out // Synchronized reset output for internal use
+    );
+    wire clk_100M; // Internal 100MHz clock
+    wire sys_rst_n; // Internal synchronized reset
     // Internal Signal Interconnects
-    wire clk_100M;
-    wire sys_rst_n;
     wire [12:0] phase_raw;
     wire [10:0] lut_addr;
     wire        lut_inv_sign;
-
+    
     // 1. Clock Wizard: Generate 100MHz from 50MHz
     clk u_clk_gen (
         .sys_clk (sys_clk),
@@ -32,7 +33,8 @@ module dds_top(
         .locked    (locked),
         .sys_rst_n (sys_rst_n)
     );
-
+    assign clk_out_100M  = clk_100M;   // Connect internal clock to output port
+    assign sys_rst_n_out = sys_rst_n; // Connect synchronized reset to output port
     // 3. Phase Accumulator: Heart of the DDS
     accumulator #(
         .ADDR_WIDTH(32),

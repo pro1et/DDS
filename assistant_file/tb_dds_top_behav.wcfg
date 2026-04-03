@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_dds_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_dds_top" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,242.001 ns"></ZoomEndTime>
+      <Cursor1Time time="1,400.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="147"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="37" />
+   <wvobject fp_name="/tb_dds_top/sys_clk" type="logic">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/ftw" type="array">
+      <obj_property name="ElementShortName">ftw[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ftw[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/ptw" type="array">
+      <obj_property name="ElementShortName">ptw[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ptw[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/dac_data" type="array">
+      <obj_property name="ElementShortName">dac_data[13:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/dac_clk" type="logic">
+      <obj_property name="ElementShortName">dac_clk</obj_property>
+      <obj_property name="ObjectShortName">dac_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/locked" type="logic">
+      <obj_property name="ElementShortName">locked</obj_property>
+      <obj_property name="ObjectShortName">locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/sys_clk" type="logic">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/locked" type="logic">
+      <obj_property name="ElementShortName">locked</obj_property>
+      <obj_property name="ObjectShortName">locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/clk_out" type="logic">
+      <obj_property name="ElementShortName">clk_out</obj_property>
+      <obj_property name="ObjectShortName">clk_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/clk_out2" type="logic">
+      <obj_property name="ElementShortName">clk_out2</obj_property>
+      <obj_property name="ObjectShortName">clk_out2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_clk_gen/clk_out3" type="logic">
+      <obj_property name="ElementShortName">clk_out3</obj_property>
+      <obj_property name="ObjectShortName">clk_out3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/en" type="logic">
+      <obj_property name="ElementShortName">en</obj_property>
+      <obj_property name="ObjectShortName">en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/freq_control" type="array">
+      <obj_property name="ElementShortName">freq_control[31:0]</obj_property>
+      <obj_property name="ObjectShortName">freq_control[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/phase_offset" type="array">
+      <obj_property name="ElementShortName">phase_offset[31:0]</obj_property>
+      <obj_property name="ObjectShortName">phase_offset[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/phase_out" type="array">
+      <obj_property name="ElementShortName">phase_out[12:0]</obj_property>
+      <obj_property name="ObjectShortName">phase_out[12:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/phase_acc" type="array">
+      <obj_property name="ElementShortName">phase_acc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">phase_acc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/ADDR_WIDTH" type="array">
+      <obj_property name="ElementShortName">ADDR_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ADDR_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_acc/PHASE_WIDTH" type="array">
+      <obj_property name="ElementShortName">PHASE_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PHASE_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_prep/phase_in" type="array">
+      <obj_property name="ElementShortName">phase_in[12:0]</obj_property>
+      <obj_property name="ObjectShortName">phase_in[12:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_prep/rom_addr" type="array">
+      <obj_property name="ElementShortName">rom_addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">rom_addr[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_prep/inv_sign" type="logic">
+      <obj_property name="ElementShortName">inv_sign</obj_property>
+      <obj_property name="ObjectShortName">inv_sign</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_prep/quadrant" type="array">
+      <obj_property name="ElementShortName">quadrant[1:0]</obj_property>
+      <obj_property name="ObjectShortName">quadrant[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_phase_prep/raw_addr" type="array">
+      <obj_property name="ElementShortName">raw_addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">raw_addr[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/inv_sign" type="logic">
+      <obj_property name="ElementShortName">inv_sign</obj_property>
+      <obj_property name="ObjectShortName">inv_sign</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/rom_addr" type="array">
+      <obj_property name="ElementShortName">rom_addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">rom_addr[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/dac_data" type="array">
+      <obj_property name="ElementShortName">dac_data[13:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[13:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/rom_data" type="array">
+      <obj_property name="ElementShortName">rom_data[9:0]</obj_property>
+      <obj_property name="ObjectShortName">rom_data[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_sine_output/inv_sign_d1" type="array">
+      <obj_property name="ElementShortName">inv_sign_d1[1:0]</obj_property>
+      <obj_property name="ObjectShortName">inv_sign_d1[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_dac_clk_forward/clk_in" type="logic">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_dac_clk_forward/dac_clk" type="logic">
+      <obj_property name="ElementShortName">dac_clk</obj_property>
+      <obj_property name="ObjectShortName">dac_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dds_top/uut/u_rst_sync/sys_rst_n" type="logic">
+      <obj_property name="ElementShortName">sys_rst_n</obj_property>
+      <obj_property name="ObjectShortName">sys_rst_n</obj_property>
+   </wvobject>
+</wave_config>
