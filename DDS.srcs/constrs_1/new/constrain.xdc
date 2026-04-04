@@ -61,3 +61,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports dac_clk]
 # PLL locked
 set_property PACKAGE_PIN G14 [get_ports locked]
 set_property IOSTANDARD LVCMOS33 [get_ports locked]
+
+# Button flag LED
+set_property PACKAGE_PIN H17 [get_ports button_flag]
+set_property IOSTANDARD LVCMOS33 [get_ports button_flag]

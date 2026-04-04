@@ -5,7 +5,8 @@ module dds_system_wrapper(
     input  wire [2:0]  keys,
     output wire [13:0] dac_data,
     output wire        dac_clk,
-    output wire        locked
+    output wire        locked,
+    output wire        button_flag
 );
 
     // Wires coming OUT of dds_top
@@ -16,7 +17,8 @@ module dds_system_wrapper(
     wire [31:0] w_ftw;
     wire [31:0] w_ptw;
     wire k1_p, k2_p, k3_p;
-
+//    reg [31:0] w_ftw = 32'd8_589_934; // Default to 200kHz
+//    reg [31:0] w_ptw = 32'd0;       // Default to 0 phase shift
     // 1. Instantiate the CORE first
     dds_top u_dds_core (
         .sys_clk       (sys_clk),
@@ -40,7 +42,8 @@ module dds_system_wrapper(
         .clk(clk_100M_internal), 
         .rst_n(rst_n_internal),
         .key1_p(k1_p), .key2_p(k2_p), .key3_p(k3_p),
-        .ftw(w_ftw), .ptw(w_ptw)
+        .ftw(w_ftw), .ptw(w_ptw),
+        .button_flag(button_flag)
     );
 
 endmodule
