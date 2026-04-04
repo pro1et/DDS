@@ -17,6 +17,9 @@ module sine_lookup_rom (
 
     // 2. Synchronize the sign bit with the ROM latency
     always @(posedge clk) begin
+    if (!rst_n) begin
+        inv_sign_d1 <= 1'b0;
+    end else 
         inv_sign_d1 <= inv_sign;
     end
 
@@ -24,7 +27,6 @@ module sine_lookup_rom (
     always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         dac_data <= 14'h2000; // Reset to the midpoint (silent/zero Volts)
-        inv_sign_d1 <= 1'b0;
     end else begin
         dac_data <= inv_sign_d1 ? (14'h2000 - {rom_data, 3'b0}) 
                                 : (14'h2000 + {rom_data, 3'b0});

@@ -31,7 +31,7 @@ module dds_system_wrapper(
     );
 
     // 2. Use those "caught" signals for the buttons
-    ax_debounce u_db1 (.clk(clk_100M_internal), .rst_n(rst_n), .button_in(keys[0]), .button_pulse(k1_p));
+    ax_debounce u_db1 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[0]), .button_pulse(k1_p));
     ax_debounce u_db2 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[1]), .button_pulse(k2_p));
     ax_debounce u_db3 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[2]), .button_pulse(k3_p));
 
@@ -39,7 +39,7 @@ module dds_system_wrapper(
     dds_control u_ctrl (
         .clk(clk_100M_internal), 
         .rst_n(rst_n_internal),
-        .key1_p(k1_p), .key2_p(k2_p), .key3_p(keys[2]),
+        .key1_p(k1_p), .key2_p(k2_p), .key3_p(k3_p),
         .ftw(w_ftw), .ptw(w_ptw)
     );
 

@@ -9,7 +9,7 @@ module ax_debounce (
 
     // 20ms at 100MHz = 2,000,000 clock cycles. 
     // This is the "settling time" to ignore mechanical bouncing.
-    parameter DELAY_20MS = 21'd100_000; 
+    parameter DELAY_20MS = 21'd2_000_000; 
 
     wire button_sync;           // Output of the CDC synchronizer
     reg  button_reg_d1;         // Delayed version of button_sync for edge detection
@@ -51,7 +51,7 @@ module ax_debounce (
             end else begin
                 // If signal changed, check if it was stable for 20ms first.
                 // We only trigger on a Falling Edge (1 -> 0) because buttons are Active-Low.
-                if (count > DELAY_20MS && button_reg_d1 == 1'b1 && button_sync == 1'b0)
+                if (count == DELAY_20MS && button_reg_d1 == 1'b1 && button_sync == 1'b0)
                     button_pulse <= 1'b1;
                 else
                     button_pulse <= 1'b0;
