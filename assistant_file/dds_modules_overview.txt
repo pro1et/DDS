@@ -1,0 +1,603 @@
+================================================================================
+  DDS PROJECT - MODULE OVERVIEW
+  Target: Mizar Z7 (Zynq-7000), DAC904 14-bit DAC
+  Top-level input clock: 50 MHz | Internal clock: 100 MHz
+================================================================================
+
+This document contains the complete source code of every RTL module in the DDS
+project, along with plain-English explanations of what each one does, why it
+exists, and how it connects to the rest of the system.
+
+The signal chain is:
+  [Keys] --> ax_debounce --> dds_control --> (ftw/ptw)
+                                                |
+  sys_clk --> clk --> accumulator --> phase_transform --> sine_lookup_rom --> dac_data
+               |                                                  |
+             rst_sync                                          blk_mem (ROM)
+               |
+             dds_clk_out --> dac_clk
+
+All of the above are wired together in dds_top, and dds_top + dds_control +
+ax_debounce are wrapped inside dds_system_wrapper (the actual synthesis top).
+
+================================================================================
+MODULE 1: dds_system_wrapper
+  File: dds_system_wrapper.v
+  Role: TOP-LEVEL synthesis wrapper. This is the module Vivado synthesizes.
+        It stitches together dds_top (the DDS core), three ax_debounce button
+        debouncers, and dds_control (the frequency/phase controller).
+        It also exposes button_flag as a debug LED output.
+================================================================================
+
+`timescale 1ns / 1ps
+module dds_system_wrapper(
+    input  wire        sys_clk,
+    input  wire        rst_n,
+    input  wire [2:0]  keys,
+    output wire [13:0] dac_data,
+    output wire        dac_clk,
+    output wire        locked,
+    output wire        button_flag
+);
+
+    // Wires coming OUT of dds_top
+    wire clk_100M_internal;
+    wire rst_n_internal;
+
+    // Wires going INTO dds_top
+    wire [31:0] w_ftw;
+    wire [31:0] w_ptw;
+    wire k1_p, k2_p, k3_p;
+
+    // 1. Instantiate the CORE first
+    dds_top u_dds_core (
+        .sys_clk       (sys_clk),
+        .rst_n         (rst_n),
+        .ftw           (w_ftw),
+        .ptw           (w_ptw),
+        .clk_out_100M  (clk_100M_internal),
+        .sys_rst_n_out (rst_n_internal),
+        .dac_data      (dac_data),
+        .dac_clk       (dac_clk),
+        .locked        (locked)
+    );
+
+    // 2. Use those "caught" signals for the buttons
+    ax_debounce u_db1 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[0]), .button_pulse(k1_p));
+    ax_debounce u_db2 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[1]), .button_pulse(k2_p));
+    ax_debounce u_db3 (.clk(clk_100M_internal), .rst_n(rst_n_internal), .button_in(keys[2]), .button_pulse(k3_p));
+
+    // 3. Control logic also uses the "internal" signals
+    dds_control u_ctrl (
+        .clk(clk_100M_internal),
+        .rst_n(rst_n_internal),
+        .key1_p(k1_p), .key2_p(k2_p), .key3_p(k3_p),
+        .ftw(w_ftw), .ptw(w_ptw),
+        .button_flag(button_flag)
+    );
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- dds_top exposes clk_out_100M and sys_rst_n_out so that the debounce and
+  control modules share the SAME clean 100 MHz clock and synchronized reset
+  as the DDS core — they must not use sys_clk directly.
+- w_ftw and w_ptw are the live frequency/phase tuning words driven by dds_control
+  and consumed by dds_top's accumulator.
+- button_flag is a single-wire debug output routed to LED pin H17.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 2: dds_top
+  File: dds_top.v
+  Role: The DDS signal-generation core. Instantiates clk, rst_sync,
+        accumulator, phase_transform, sine_lookup_rom, and dds_clk_out.
+        Takes ftw/ptw from the wrapper and produces dac_data + dac_clk.
+================================================================================
+
+`timescale 1ns / 1ps
+
+module dds_top(
+    input  wire        sys_clk,       // 50 MHz board clock
+    input  wire        rst_n,         // External reset button
+    input  wire [31:0] ftw,           // Frequency Tuning Word
+    input  wire [31:0] ptw,           // Phase Tuning Word
+    output wire [13:0] dac_data,      // 14-bit Sine Wave data to DAC904
+    output wire        dac_clk,       // Clock signal for DAC904
+    output wire        locked,        // PLL lock status LED
+    output wire        clk_out_100M,  // 100MHz clock output (for wrapper)
+    output wire        sys_rst_n_out  // Synchronized reset output (for wrapper)
+    );
+    wire clk_100M;
+    wire sys_rst_n;
+    wire [12:0] phase_raw;
+    wire [10:0] lut_addr;
+    wire        lut_inv_sign;
+
+    // 1. Clock Wizard: Generate 100MHz from 50MHz
+    clk u_clk_gen (
+        .sys_clk (sys_clk),
+        .rst_n   (rst_n),
+        .locked  (locked),
+        .clk_out (clk_100M)
+    );
+
+    // 2. Reset Synchronizer
+    rst_sync u_rst_sync (
+        .clk       (clk_100M),
+        .rst_n     (rst_n),
+        .locked    (locked),
+        .sys_rst_n (sys_rst_n)
+    );
+    assign clk_out_100M  = clk_100M;
+    assign sys_rst_n_out = sys_rst_n;
+
+    // 3. Phase Accumulator
+    accumulator #(.ADDR_WIDTH(32), .PHASE_WIDTH(13)) u_phase_acc (
+        .clk           (clk_100M),
+        .rst_n         (sys_rst_n),
+        .en            (1'b1),
+        .freq_control  (ftw),
+        .phase_offset  (ptw),
+        .phase_out     (phase_raw)
+    );
+
+    // 4. Phase Transform (quarter-wave symmetry)
+    phase_transform u_phase_prep (
+        .phase_in (phase_raw),
+        .rom_addr (lut_addr),
+        .inv_sign (lut_inv_sign)
+    );
+
+    // 5. Sine Lookup ROM
+    sine_lookup_rom u_sine_output (
+        .clk      (clk_100M),
+        .inv_sign (lut_inv_sign),
+        .rom_addr (lut_addr),
+        .rst_n    (sys_rst_n),
+        .dac_data (dac_data)
+    );
+
+    // 6. DAC Clock Forwarding via ODDR
+    dds_clk_out u_dac_clk_forward (
+        .clk_in  (clk_100M),
+        .dac_clk (dac_clk)
+    );
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- The DDS equation is: Fout = (FTW * Fclk) / 2^32
+  Example: FTW=4,294,967 gives Fout = (4294967 * 100e6) / 2^32 ≈ 100 kHz
+- The 32-bit accumulator overflows naturally, producing a sawtooth phase ramp.
+- Only the top 13 bits of the phase are used for the sine LUT (phase_raw).
+- The ODDR primitive is used to forward the 100 MHz clock to the DAC pin
+  without clock degradation.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 3: clk
+  File: clk.v
+  Role: Wraps the Vivado Clocking Wizard IP (clk_wiz_0).
+        Converts the 50 MHz board clock into 100 MHz for the DDS core.
+================================================================================
+
+`timescale 1ns / 1ps
+
+module clk(
+    input  wire sys_clk,   // 50 MHz system clock
+    input  wire rst_n,     // active-low reset
+    output wire locked,    // PLL lock status
+    output wire clk_out    // 100 MHz output
+);
+    wire clk_out2;   // 100 MHz with 180 degree phase shift (unused externally)
+    wire clk_out3;   // 25 MHz (unused externally)
+
+    clk_wiz_0 u_clk_wiz_0 (
+        .clk_out1(clk_out),
+        .clk_out2(clk_out2),
+        .clk_out3(clk_out3),
+        .resetn(rst_n),
+        .locked(locked),
+        .clk_in1(sys_clk)
+    );
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- clk_wiz_0 is a Xilinx IP block configured in Vivado. It uses the MMCM
+  primitive inside the FPGA to generate stable, low-jitter clocks.
+- "locked" goes HIGH only after the PLL has stabilized. The rst_sync module
+  uses this signal to hold the system in reset until the clock is clean.
+- clk_out2 (180 deg) and clk_out3 (25 MHz) are generated but unused in the
+  current design — they are available for future expansion.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 4: rst_sync
+  File: rst.v
+  Role: Reset synchronizer. Ensures the internal reset is cleanly released
+        on a clock edge, preventing metastability at startup.
+================================================================================
+
+module rst_sync(
+    input  wire clk,
+    input  wire rst_n,    // External active-low reset
+    input  wire locked,   // PLL lock signal
+    output wire sys_rst_n // Synchronized active-low reset
+);
+
+wire rst_async_n;
+reg [1:0] sync_ff;
+
+// System is in reset if EITHER the button is pressed OR the PLL is not locked
+assign rst_async_n = rst_n & locked;
+
+// 2-stage synchronizer: releases reset synchronously with the clock
+always @(posedge clk or negedge rst_async_n) begin
+    if (!rst_async_n)
+        sync_ff <= 2'b00;
+    else
+        sync_ff <= {sync_ff[0], 1'b1};
+end
+
+assign sys_rst_n = sync_ff[1];
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- This is a standard "reset synchronizer" pattern in FPGA design.
+- The 2-bit shift register (sync_ff) ensures sys_rst_n only de-asserts
+  (goes HIGH) after two full clock cycles, preventing glitches.
+- The system stays in reset until BOTH the external button is released AND
+  the PLL reports it is locked. This prevents the DDS core from running on
+  an unstable clock.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 5: accumulator
+  File: accumulator.v
+  Role: The heart of the DDS. A 32-bit phase accumulator that increments by
+        ftw every clock cycle, producing a sawtooth phase ramp. The top 13
+        bits are output as the instantaneous phase for the sine LUT.
+================================================================================
+
+module accumulator #(
+    parameter ADDR_WIDTH  = 32,
+    parameter PHASE_WIDTH = 13
+)(
+    input  wire                    clk,
+    input  wire                    rst_n,
+    input  wire                    en,
+    input  wire [ADDR_WIDTH-1:0]   freq_control,  // FTW
+    input  wire [ADDR_WIDTH-1:0]   phase_offset,  // PTW
+    output reg  [PHASE_WIDTH-1:0]  phase_out
+);
+
+    reg [ADDR_WIDTH-1:0] phase_acc;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            phase_acc <= {ADDR_WIDTH{1'b0}};
+            phase_out <= {PHASE_WIDTH{1'b0}};
+        end
+        else if (en) begin
+            phase_acc <= phase_acc + freq_control;
+            // Add phase offset, then take top PHASE_WIDTH bits
+            phase_out <= (phase_acc + phase_offset) >> (ADDR_WIDTH - PHASE_WIDTH);
+        end
+    end
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- The accumulator wraps around naturally on 32-bit overflow, which is correct
+  DDS behavior (one full wrap = one complete sine cycle).
+- Frequency resolution = Fclk / 2^32 = 100e6 / 4294967296 ≈ 0.023 Hz/LSB.
+- The phase offset (ptw) shifts the sine wave in phase without changing freq.
+  PTW = 0x40000000 = 90 degrees (2^32 / 4).
+- Only the top 13 bits are sent to the LUT, discarding the lower 19 bits.
+  This is called "phase truncation" and is standard in DDS design.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 6: phase_transform
+  File: phase_transform.v
+  Role: Exploits quarter-wave symmetry to reduce ROM size by 4x.
+        A full sine wave is symmetric: Q2 mirrors Q1, Q3/Q4 are negative Q1/Q2.
+        So only Q1 (2048 samples) needs to be stored in the ROM.
+================================================================================
+
+module phase_transform (
+    input  wire [12:0] phase_in,   // 13-bit phase from accumulator
+    output reg  [10:0] rom_addr,   // 11-bit address into the ROM
+    output reg         inv_sign    // 1 = negate the ROM output
+);
+
+    wire [1:0]  quadrant = phase_in[12:11]; // Top 2 bits = quadrant (0-3)
+    wire [10:0] raw_addr = phase_in[10:0];  // Lower 11 bits = position within quadrant
+
+    always @(*) begin
+        case (quadrant)
+            2'b00: begin rom_addr = raw_addr;  inv_sign = 1'b0; end // Q1: direct
+            2'b01: begin rom_addr = ~raw_addr; inv_sign = 1'b0; end // Q2: mirror
+            2'b10: begin rom_addr = raw_addr;  inv_sign = 1'b1; end // Q3: negate
+            2'b11: begin rom_addr = ~raw_addr; inv_sign = 1'b1; end // Q4: mirror+negate
+        endcase
+    end
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- This is a purely combinational module (no clock).
+- Mirroring in Q2/Q4 is done by bit-inverting the address (~raw_addr),
+  which counts the address backward through the ROM.
+- inv_sign tells sine_lookup_rom to subtract from midpoint instead of add,
+  producing the negative half of the sine wave.
+- ROM only needs 2^11 = 2048 entries instead of 2^13 = 8192.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 7: blk_mem
+  File: blk_mem.v
+  Role: Thin wrapper around the Vivado Block Memory Generator IP (blk_mem_gen_0).
+        Acts as a 2048-entry x 10-bit ROM storing the first quarter of a
+        sine wave (values 0 to 1023).
+================================================================================
+
+`timescale 1ns / 1ns
+
+module blk_mem(
+    input  wire        clka,
+    input  wire [10:0] addra,  // 11-bit address (2048 entries)
+    output wire [9:0]  douta   // 10-bit sine amplitude value
+);
+
+   blk_mem_gen_0 blk_mem_gen_0 (
+        .clka (clka),
+        .addra(addra),
+        .douta(douta)
+    );
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- blk_mem_gen_0 is a Xilinx IP initialized with a .mif (memory init file)
+  containing pre-computed sine values for the first quarter wave.
+- The ROM has 1 clock cycle read latency (synchronous read).
+- Output is 10 bits wide (values 0-1023), which gets scaled to 14 bits
+  in sine_lookup_rom by left-shifting 3 bits ({rom_data, 3'b0}).
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 8: sine_lookup_rom
+  File: sine_lookup_rom.v
+  Role: Reads sine amplitude from blk_mem, synchronizes the sign bit with
+        the ROM latency, and reconstructs the full 14-bit offset-binary
+        DAC output around a midpoint of 0x2000 (8192).
+================================================================================
+
+module sine_lookup_rom (
+    input  wire        clk,
+    input  wire        rst_n,
+    input  wire        inv_sign,       // From phase_transform
+    input  wire [10:0] rom_addr,       // From phase_transform
+    output reg  [13:0] dac_data
+);
+    wire [9:0] rom_data;
+    reg inv_sign_d1;  // inv_sign delayed by 1 cycle to match ROM latency
+
+    // 1. ROM (1-cycle latency)
+    blk_mem u_blk_mem (
+        .clka (clk),
+        .addra(rom_addr),
+        .douta(rom_data)
+    );
+
+    // 2. Delay inv_sign by 1 cycle to align with rom_data output
+    always @(posedge clk) begin
+        if (!rst_n)
+            inv_sign_d1 <= 1'b0;
+        else
+            inv_sign_d1 <= inv_sign;
+    end
+
+    // 3. Reconstruct signed output in offset-binary format
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            dac_data <= 14'h2000;  // Midpoint = 0V
+        else
+            dac_data <= inv_sign_d1 ? (14'h2000 - {rom_data, 3'b0})
+                                    : (14'h2000 + {rom_data, 3'b0});
+    end
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- The DAC904 uses offset-binary encoding: 0x0000 = most negative,
+  0x2000 (8192) = zero volts, 0x3FFF = most positive.
+- {rom_data, 3'b0} left-shifts the 10-bit value by 3, scaling it to 13 bits
+  for addition/subtraction around the 14-bit midpoint.
+- inv_sign_d1 is a 1-cycle delayed version of inv_sign to compensate for
+  the synchronous ROM read latency — critical for correct waveform output.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 9: dds_clk_out
+  File: dds_clk_out.v
+  Role: Forwards the 100 MHz internal clock to the physical DAC clock pin
+        using an ODDR (Output Double Data Rate) primitive.
+================================================================================
+
+module dds_clk_out (
+    input  wire clk_in,  // 100MHz from clk module
+    output wire dac_clk  // Physical DAC clock pin
+);
+
+    ODDR #(
+        .DDR_CLK_EDGE("OPPOSITE_EDGE"),
+        .INIT(1'b0),
+        .SRTYPE("SYNC")
+    ) u_oddr_inst (
+        .Q (dac_clk),
+        .C (clk_in),
+        .CE(1'b1),
+        .D1(1'b1),   // Drive HIGH on rising edge
+        .D2(1'b0),   // Drive LOW on falling edge
+        .R (1'b0),
+        .S (1'b0)
+    );
+
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- Directly assigning a clock signal to an output port in Vivado causes
+  DRC errors and poor signal integrity. The ODDR primitive routes the clock
+  through a dedicated high-speed output path in the FPGA I/O block.
+- D1=1, D2=0 makes the output toggle every half-cycle, which is identical
+  to the input clock — it is NOT DDR data, it is a clock forwarding trick.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 10: ax_debounce
+  File: ax_debounce.v
+  Role: Button debouncer with CDC synchronization. Converts a raw, noisy
+        mechanical button press into a single clean 1-cycle pulse.
+================================================================================
+
+`timescale 1ns / 1ps
+
+module ax_debounce (
+    input  wire clk,
+    input  wire rst_n,
+    input  wire button_in,      // Raw asynchronous input from FPGA pin
+    output reg  button_pulse    // HIGH for exactly 1 clock cycle on valid press
+);
+
+    parameter DELAY_20MS = 21'd2_000_000; // 20ms at 100MHz
+
+    wire button_sync;
+    reg  button_reg_d1;
+    reg [19:0] count;
+
+    // 1. CDC Synchronization (prevents metastability)
+    xpm_cdc_single #(
+        .DEST_SYNC_FF(2),
+        .INIT_SYNC_FF(1),
+        .SIM_ASSERT_CHK(0),
+        .SRC_INPUT_REG(0)
+    ) u_xpm_cdc (
+        .dest_out(button_sync),
+        .dest_clk(clk),
+        .src_clk (1'b0),
+        .src_in  (button_in)
+    );
+
+    // 2. Debounce + edge detection
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            count        <= 20'd0;
+            button_reg_d1 <= 1'b1;
+            button_pulse <= 1'b0;
+        end else begin
+            button_reg_d1 <= button_sync;
+
+            if (button_sync == button_reg_d1) begin
+                if (count < DELAY_20MS) count <= count + 1'b1;
+                button_pulse <= 1'b0;
+            end else begin
+                if (count == DELAY_20MS && button_reg_d1 == 1'b1 && button_sync == 1'b0)
+                    button_pulse <= 1'b1;
+                else
+                    button_pulse <= 1'b0;
+                count <= 20'd0;
+            end
+        end
+    end
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- Buttons on the Mizar Z7 are active-low (pulled HIGH by default).
+- xpm_cdc_single is Xilinx's recommended CDC synchronizer macro. It inserts
+  a 2-stage flip-flop chain to safely cross from the async button domain
+  to the 100 MHz clock domain.
+- The debounce logic only issues a pulse after the signal has been stable
+  at the new level for exactly 20 ms (2,000,000 cycles at 100 MHz).
+- Only falling edges (1->0) generate a pulse, matching active-low buttons.
+--------------------------------------------------------------------------------
+
+
+================================================================================
+MODULE 11: dds_control
+  File: dds_control.v
+  Role: Interprets button pulses and updates the Frequency Tuning Word (ftw)
+        and Phase Tuning Word (ptw) sent to the DDS core.
+        Also outputs button_flag (LOW when any button is active) for debug.
+================================================================================
+
+`timescale 1ns / 1ps
+
+module dds_control (
+    input  wire        clk,
+    input  wire        rst_n,
+    input  wire        key1_p,         // Pulse: Increase Frequency
+    input  wire        key2_p,         // Pulse: Decrease Frequency
+    input  wire        key3_p,         // Pulse: Shift Phase by 90 deg
+    output reg  [31:0] ftw,            // Frequency Tuning Word
+    output reg  [31:0] ptw,            // Phase Tuning Word
+    output wire        button_flag     // LOW when any button is pressed (debug LED)
+);
+
+    localparam FTW_100KHZ = 32'd4_294_967;   // 100 kHz default
+    localparam FTW_10KHZ  = 32'd429_497;     // Step size = 10 kHz
+    localparam PTW_PI_2   = 32'h4000_0000;   // 90 degrees
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            ftw <= FTW_100KHZ;
+            ptw <= 32'd0;
+        end else begin
+            if (key1_p)
+                ftw <= ftw + FTW_10KHZ;   // Increase frequency by 10 kHz
+            else if (key2_p)
+                ftw <= ftw - FTW_10KHZ;   // Decrease frequency by 10 kHz
+            if (key3_p)
+                ptw <= ptw + PTW_PI_2;    // Shift phase by 90 degrees
+        end
+    end
+endmodule
+
+--------------------------------------------------------------------------------
+Key points for Gemini:
+- Default output frequency on startup is 100 kHz (FTW = 4,294,967).
+- Each press of key1 increases frequency by 10 kHz; key2 decreases by 10 kHz.
+- Each press of key3 advances the phase by 90 degrees (quarter cycle).
+  Four presses return the wave to its original phase.
+- button_flag is a debug wire — it goes LOW while any button is actively
+  pressed and is routed to LED pin H17 via the XDC constraint.
+- FTW math: FTW = (Fout * 2^32) / Fclk
+  100 kHz: (100000 * 4294967296) / 100000000 = 4,294,967
+  10  kHz step: (10000 * 4294967296) / 100000000 = 429,497
+--------------------------------------------------------------------------------
+
+
+================================================================================
+  END OF DOCUMENT
+================================================================================

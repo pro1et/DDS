@@ -60,6 +60,7 @@ module dds_top(
         .clk      (clk_100M),
         .inv_sign (lut_inv_sign),
         .rom_addr (lut_addr),
+        .rst_n    (sys_rst_n),
         .dac_data (dac_data)
     );
 

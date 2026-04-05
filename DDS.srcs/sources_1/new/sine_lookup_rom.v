@@ -7,7 +7,7 @@ module sine_lookup_rom (
 );
     wire [9:0] rom_data;
     reg inv_sign_d1;        // Delayed version of inv_sign
-
+    reg inv_sign_d2;        // Further delayed 
     // 1. Instantiate the ROM (1-cycle latency)
     blk_mem u_blk_mem (
         .clka(clk),
@@ -19,8 +19,10 @@ module sine_lookup_rom (
     always @(posedge clk) begin
     if (!rst_n) begin
         inv_sign_d1 <= 1'b0;
+        inv_sign_d2 <= 1'b0;
     end else 
         inv_sign_d1 <= inv_sign;
+        inv_sign_d2 <= inv_sign_d1; // Now inv_sign_d2 is perfectly aligned with rom_data
     end
 
     // 3. Process the output using the synchronized sign bit
@@ -28,7 +30,7 @@ module sine_lookup_rom (
     if (!rst_n) begin
         dac_data <= 14'h2000; // Reset to the midpoint (silent/zero Volts)
     end else begin
-        dac_data <= inv_sign_d1 ? (14'h2000 - {rom_data, 3'b0}) 
+        dac_data <= inv_sign_d2 ? (14'h2000 - {rom_data, 3'b0}) 
                                 : (14'h2000 + {rom_data, 3'b0});
     end
     end

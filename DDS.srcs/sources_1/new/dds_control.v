@@ -6,7 +6,8 @@ module dds_control (
     input  wire key2_p,         // Pulse from K5: Decrease Frequency
     input  wire key3_p,         // Pulse from K6: Shift Phase
     output reg [31:0] ftw,      // Frequency Tuning Word to DDS
-    output reg [31:0] ptw       // Phase Tuning Word to DDS
+    output reg [31:0] ptw,      // Phase Tuning Word to DDS
+    output reg button_flag     // For debugging: Low when any button is pressed
 );
 
     // Math: FTW = (Freq_Out * 2^32) / Clock_Freq
@@ -24,17 +25,23 @@ module dds_control (
         if (!rst_n) begin
             ftw <= FTW_100KHZ; // Set default frequency on startup
             ptw <= 32'd0;      // Set default phase to 0
+            button_flag <= 1'd1;
         end else begin
             // Frequency Up
-            if (key1_p) 
+            if (key1_p)begin
                 ftw <= ftw + FTW_10KHZ;
+                button_flag <= 1'b0;//Debugging signal. Low when any button is pressed. Remember to change this back to 1'b0
+            end
             // Frequency Down
-            else if (key2_p)
+            else if (key2_p)begin
                 ftw <= ftw - FTW_10KHZ;
-
+                button_flag <= 1'b0;//Debugging signal. Low when any button is pressed. Remember to change this back to 1'b0
+            end
             // Phase Shift: Every press jumps the wave forward by 90 degrees
-            if (key3_p)
+            if (key3_p)begin//this is a test.remember to change this back to key3_p
                 ptw <= ptw + PTW_PI_2;
+                button_flag <= 1'b0;//Debugging signal. Low when any button is pressed. Remember to change this back to 1'b0
+            end
         end
     end
 endmodule
