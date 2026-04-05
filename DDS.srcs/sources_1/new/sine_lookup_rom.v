@@ -20,9 +20,10 @@ module sine_lookup_rom (
     if (!rst_n) begin
         inv_sign_d1 <= 1'b0;
         inv_sign_d2 <= 1'b0;
-    end else 
+    end else begin
         inv_sign_d1 <= inv_sign;
         inv_sign_d2 <= inv_sign_d1; // Now inv_sign_d2 is perfectly aligned with rom_data
+    end
     end
 
     // 3. Process the output using the synchronized sign bit
