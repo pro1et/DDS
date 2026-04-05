@@ -15,7 +15,7 @@ module dds_control (
     localparam FTW_100KHZ = 32'd4_294_967;
 
     // (10,000 * 4,294,967,296) / 100,000,000 = 429,497
-    localparam FTW_10KHZ  = 32'd429_497;
+    localparam FTW_10KHZ  = 32'd429_4970;
 
     // Phase: 2^32 represents 360 degrees.
     // 90 degrees (pi/2) is 2^32 / 4 = 2^30 = 1,073,741,824 (0x40000000)
