@@ -13,7 +13,7 @@ module ax_debounce (
 
     wire button_sync;           // Output of the CDC synchronizer
     reg  button_reg_d1;         // Delayed version of button_sync for edge detection
-    reg [19:0] count;           // Counter to track how long the signal is stable
+    reg [20:0] count;           // Counter to track how long the signal is stable
 
     // -------------------------------------------------------------------------
     // 1. Clock Domain Crossing (CDC) Synchronization
